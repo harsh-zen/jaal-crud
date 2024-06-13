@@ -13,28 +13,25 @@ import (
 	"go.appointy.com/jaal/schemabuilder"
 )
 
-
-
-
-
 func main() {
 	sb := schemabuilder.NewSchema()
 	appointment.RegisterPayload(sb)
+	appointment.RegisterInput(sb)
 	typ := reflect.TypeOf(time.Time{})
 	schemabuilder.RegisterScalar(typ, "DateTime", func(value interface{}, dest reflect.Value) error {
-    v, ok := value.(string)
-    if !ok {
-        return errors.New("invalid type expected string")
-    }
+		v, ok := value.(string)
+		if !ok {
+			return errors.New("invalid type expected string")
+		}
 
-    t, err := time.Parse(time.RFC3339, v)
-    if err != nil {
-        return err
-    }
+		t, err := time.Parse(time.RFC3339, v)
+		if err != nil {
+			return err
+		}
 
-    dest.Set(reflect.ValueOf(t))
+		dest.Set(reflect.ValueOf(t))
 
-    return nil
+		return nil
 	})
 
 	s:= &appointment.Server{
@@ -63,9 +60,8 @@ func main() {
 
 	introspection.AddIntrospectionToSchema(schema)
 
-	http.Handle("/query", jaal.HTTPHandler(schema))
-	log.Println("Server ready at 8080")
-	log.Println("Running")
+	http.Handle("/graphql", jaal.HTTPHandler(schema))
+	log.Println("Server ready at 9000")
     if err := http.ListenAndServe(":9000", nil); err!= nil {
         panic(err)
     }
